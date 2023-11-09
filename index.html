@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <meta charset="UTF-8">
+  <title>Charadas do Marcos</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    #rules {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    #riddle {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    #user-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+</style>
+</head>
+
+<body style="background-image: url('inter.jpg'); background-size: cover; background-repeat: no-repeat; background-attachment: fixed; margin: 0; padding: 0;">
+  <div class="container">
+    <h1>Jogo de Charadas</h1>
+    <p id="rules">Regras do Jogo:</p>
+    <ul>
+        <li>Você deve adivinhar a resposta correta para cada charada.</li>
+        <li>Você tem duas tentativas por charada.</li>
+        <li>Observe a acentuação.</li>
+        <li style="color: rgb(210, 13, 10);" >Respostas com palavras escritas com acentuação errada serão recusadas.</li>
+
+    <div id="riddle"></div>
+    <input type="text" id="user-input" placeholder="Digite sua resposta e pressione Enter...">
+    <div id="result"></div>
+</div>
+
+<script>
+    const riddles = [
+        { question: "O que é, o que é: quando mais se tira, maior ele fica?", answers: ["buraco", "burak"] },
+        { question: "O que é, o que é: é redondo como uma bola, mas não quica?", answers: ["sol"] },
+        { question: "O que é, o que é: tem asas e não voa, tem bico e não pica?", answers: ["avião"] },
+        { question: "O que é, o que é: tem 4 patas e mia?", answers: ["gato"] },
+        { question: "O que é, o que é: corre sem sair do lugar?", answers: ["água"] },
+        { question: "O que é, o que é: está no centro do universo?", answers: ["sol"] },
+        { question: "O que é, o que é: é feito de madeira, mas não pode ser serrado?", answers: ["serradura"] },
+        { question: "O que é, o que é: qual é a fruta mais rica?", answers: ["banana ouro"] },
+        { question: "O que é, o que é: qual é a fruta que nunca reprova?", answers: ["uva passa"] },
+        { question: "O que é, o que é: sempre volta para o dono?", answers: ["bumerangue"] },
+        { question: "O que é, o que é: tem folhas, mas não é uma árvore?", answers: ["livro"] },
+        { question: "O que é, o que é: é feito de vidro, mas não quebra?", answers: ["copo"] },
+        { question: "O que é, o que é: tem rodas, mas não é um veículo?", answers: ["carrinho"] },
+        { question: "O que é, o que é: tem dentes, mas não morde?", answers: ["pente"] },
+        { question: "O que é, o que é: voa, mas não é um pássaro?", answers: ["avião"] },
+        { question: "O que é, o que é: é preto e branco e se parece com um jornal?", answers: ["piano"] },
+        { question: "O que é, o que é: podemos encontrá-lo no final do arco-íris?", answers: ["tesouro"] },
+        { question: "O que é, o que é: está sempre na frente, mas não pode ser visto?", answers: ["futuro"] },
+        { question: "O que é, o que é: sobe sem nunca parar?", answers: ["idade"] },
+        { question: "O que é, o que é: tem um olho, mas não enxerga?", answers: ["furadeira"] },
+    ];
+
+    const poems = [
+        "No céu, estrelas brilham com paixão,Na noite, a lua guia nossa escuridão,Sonhos tecem a mágica da imaginação.",
+        "A brisa suave beija o mar,Nas ondas dançam segredos a brilhar,No pôr do sol, a paz a nos abraçar.",
+        "Sob o céu azul, voam os pássaros livres,Sob o céu azul, voam os pássaros livres,Sob o céu azul, voam os pássaros livres.",
+        "No silêncio da noite, a estrela solitária,Ilumina sonhos na escuridão necessária,A madrugada guarda a esperança lendária.",
+        "A chuva cai, a terra se renova,rNas folhas, gotas brilham na alcova,O ciclo da vida, uma história que comova.",
+        "Em cada sorriso, o mundo se colore,Na amizade, o coração se enche de amor,A vida é uma jornada que não tem fim, senão, em pôr.",
+
+    ];
+
+    function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        shuffleArray(riddles);
+        riddles.splice(5); 
+
+        const riddleElement = document.getElementById('riddle');
+        const userInput = document.getElementById('user-input');
+        const resultElement = document.getElementById('result');
+        let currentRiddleIndex = 0;
+        let tries = 0;
+        let correctAnswersCount = 0;
+
+        function displayRiddle() {
+            riddleElement.textContent = riddles[currentRiddleIndex].question;
+        }
+
+        function checkAnswer() {
+            const userAnswer = userInput.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const correctAnswers = riddles[currentRiddleIndex].answers.map(answer => answer.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+
+            if (correctAnswers.includes(userAnswer)) {
+                resultElement.textContent = "Resposta correta! Próxima charada:";
+                currentRiddleIndex = (currentRiddleIndex + 1) % riddles.length;
+                tries = 0;
+                correctAnswersCount++;
+
+                if (correctAnswersCount === riddles.length) {
+                    resultElement.textContent = "Parabéns! Você acertou todas as charadas. Aqui está um poema para você:";
+                    const randomPoem = poems[Math.floor(Math.random() * poems.length)];
+                    riddleElement.textContent = randomPoem;
+                } else {
+                    userInput.value = '';
+                    displayRiddle();
+                }
+            } else {
+                tries++;
+                if (tries >= 2) {
+                    resultElement.textContent = "Você errou nas duas tentativas. O jogo será reiniciado.";
+                    currentRiddleIndex = 0;
+                } else {
+                    resultElement.textContent = "Resposta incorreta. Tente novamente.";
+                }
+                userInput.value = '';
+                displayRiddle();
+            }
+        }
+
+        userInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                checkAnswer();
+            }
+        });
+
+        displayRiddle();
+    </script>
+</body>
+</html>
